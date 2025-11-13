@@ -1,0 +1,23 @@
+# This workflow will publish a docker image on tag
+
+name: Upload Docker image on tag
+on:
+    push:
+      tags:
+      - '*'
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build and push docker image
+      run: |
+        IMAGE_ID=ghcr.io/${{ github.repository }}
+        VERSION=${{ github.ref_name }}
+        echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+        docker build -t $IMAGE_ID:$VERSION .
+        docker push $IMAGE_ID:$VERSION
